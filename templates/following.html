@@ -1,0 +1,4 @@
+{% for user in users %}
+        {{ user.username }} 
+        <a href = "{{ url_for('following', user_id = user.id) }}">Unfollow</a><br>
+{% endfor %}

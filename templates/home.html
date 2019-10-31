@@ -1,0 +1,18 @@
+<div>
+	<p>Home</p>
+	{% if current_user.is_authenticated %}
+		{{ current_user.username }}<br><br><br>	
+		<div style="text-align: right;">
+				<a href="/logout">Logout</a>
+				<a href="/people">People</a>
+				<a href="/people">followers</a>
+				<a href="/people">following</a>
+		</div>
+		</div>
+	{% else %}
+		<div style="text-align: right;">
+			<a href="/login">Login</a>
+			<a href="/register">Register</a>
+		</div>
+	{% endif %}
+</div>

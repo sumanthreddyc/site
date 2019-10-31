@@ -1,0 +1,36 @@
+<div >
+    <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        <fieldset >
+            <legend >Login</legend>
+            <div >
+                {{ form.username.label() }}
+                {{ form.username() }}
+                {% if form.username.errors %}
+                    <div >
+                        {% for error in form.username.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            <div>
+                {{ form.password.label() }}
+                {{ form.password() }}
+                {% if form.password.errors %}
+                    <div >
+                        {% for error in form.password.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </fieldset>
+        <div >
+            {{ form.submit() }}
+        </div>
+    </form>
+</div>
+
+<div >Do not Have An Account? <a href="{{ url_for('register') }}">Register here</a></div>
+<a href="/">Home</a><br>
