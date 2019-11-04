@@ -85,11 +85,6 @@ class Post(db.Model, UserMixin):
     post = db.Column(db.String(20), nullable=False)
     user_id = db.Column(db.Integer, nullable=False)
 
-    def followed_posts(self):
-        return Post.query.join(
-            followers, (followers.followed_id == Post.user_id)).filter(
-            followers.follower_id == self.id)
-
 
 class RegistrationForm(FlaskForm):
     username = StringField('Username',
@@ -122,11 +117,11 @@ class PostForm(FlaskForm):
     submit = SubmitField('Post')
 
 
-posts = Post.query.all()
-
-
 @app.route("/")
 def home():
+    posts = Post.query.join(
+        Followers, (Followers.followed_id == Post.user_id)).filter(
+        Followers.follower_id == current_user.id)
     return render_template('home.html', current_user=current_user, posts=posts)
 
 
