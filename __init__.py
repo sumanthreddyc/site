@@ -79,6 +79,7 @@ def unfollow(self, user):
 def is_following(self, user):
     return self.followed.filter(followers.c.followed_id == user.id).count() > 0
 
+
 class Post(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     post = db.Column(db.String(20), nullable=False)
@@ -87,7 +88,8 @@ class Post(db.Model, UserMixin):
     def followed_posts(self):
         return Post.query.join(
             followers, (followers.followed_id == Post.user_id)).filter(
-                followers.follower_id == self.id)
+            followers.follower_id == self.id)
+
 
 class RegistrationForm(FlaskForm):
     username = StringField('Username',
@@ -116,14 +118,16 @@ class UnfollowForm(FlaskForm):
 
 
 class PostForm(FlaskForm):
-    post = StringField('Post',validators=[DataRequired(), Length(min=2, max=200)])
+    post = StringField('Post', validators=[DataRequired(), Length(min=2, max=200)])
     submit = SubmitField('Post')
+
 
 posts = Post.query.all()
 
+
 @app.route("/")
 def home():
-    return render_template('home.html', current_user=current_user, posts = posts)
+    return render_template('home.html', current_user=current_user, posts=posts)
 
 
 @app.route("/register", methods=['GET', 'POST'])
@@ -188,10 +192,11 @@ def user(user_id):
         return render_template('people.html', form=form, user=user)
     return render_template('follow.html', form=form, user=user)
 
+
 @app.route("/followers", methods=['GET', 'POST'])
 @login_required
 def follower():
-    users = Followers.query.filter_by(followed_id=current_user.id)
+    users = User.query.join(Followers, User.id == Followers.follower_id).filter(Followers.followed_id == current_user.id).all()
     return render_template('followers.html', users=users)
 
 
@@ -200,11 +205,12 @@ def follower():
 def post():
     form = PostForm()
     if request.method == 'POST':
-        post = Post(post = form.post.data, user_id = current_user.id)
+        post = Post(post=form.post.data, user_id=current_user.id)
         db.session.add(post)
         db.session.commit()
         return render_template('home.html', form=form, user=user)
-    return render_template('post.html', form = form)
+    return render_template('post.html', form=form)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
