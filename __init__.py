@@ -79,6 +79,15 @@ def unfollow(self, user):
 def is_following(self, user):
     return self.followed.filter(followers.c.followed_id == user.id).count() > 0
 
+class Post(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    post = db.Column(db.String(20), nullable=False)
+    user_id = db.Column(db.Integer, nullable=False)
+
+    def followed_posts(self):
+        return Post.query.join(
+            followers, (followers.followed_id == Post.user_id)).filter(
+                followers.follower_id == self.id)
 
 class RegistrationForm(FlaskForm):
     username = StringField('Username',
@@ -106,9 +115,15 @@ class UnfollowForm(FlaskForm):
     submit = SubmitField('Unfollow')
 
 
+class PostForm(FlaskForm):
+    post = StringField('Post',validators=[DataRequired(), Length(min=2, max=200)])
+    submit = SubmitField('Post')
+
+posts = Post.query.all()
+
 @app.route("/")
 def home():
-    return render_template('home.html', current_user=current_user)
+    return render_template('home.html', current_user=current_user, posts = posts)
 
 
 @app.route("/register", methods=['GET', 'POST'])
@@ -154,12 +169,10 @@ def logout():
     return redirect(url_for('home'))
 
 
-users = User.query.all()
-
-
 @app.route("/people", methods=['GET', 'POST'])
 @login_required
 def people():
+    users = User.query.all()
     return render_template('people.html', current_user=current_user, users=users)
 
 
@@ -175,21 +188,23 @@ def user(user_id):
         return render_template('people.html', form=form, user=user)
     return render_template('follow.html', form=form, user=user)
 
-
 @app.route("/followers", methods=['GET', 'POST'])
 @login_required
-def followers():
-    users = followers.query.filter_by(followed_id=current_user.id)
-    return render_template('followers.html', current_user=current_user, users=users)
+def follower():
+    users = Followers.query.filter_by(followed_id=current_user.id)
+    return render_template('followers.html', users=users)
 
 
-@app.route("/following", methods=['GET', 'POST'])
+@app.route("/post", methods=['GET', 'POST'])
 @login_required
-def following():
-    form = UnfollowForm()
-    users = followers.query.filter_by(follower_id=current_user.id)
-    return render_template('following.html', current_user=current_user, users=users, form=form)
-
+def post():
+    form = PostForm()
+    if request.method == 'POST':
+        post = Post(post = form.post.data, user_id = current_user.id)
+        db.session.add(post)
+        db.session.commit()
+        return render_template('home.html', form=form, user=user)
+    return render_template('post.html', form = form)
 
 if __name__ == '__main__':
     app.run(debug=True)

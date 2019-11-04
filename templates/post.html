@@ -1,0 +1,20 @@
+<div>
+    <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        <fieldset >
+            <legend >Post</legend>
+            <div >
+                {{ form.post.label() }}
+
+				{{ form.post() }}
+            </div>
+        </fieldset>
+
+        <div >
+            {{ form.submit() }}
+        </div>
+    </form>
+    <div style="text-align: right;">    
+    <a href = "/">Home</a>
+</div>
+</div>

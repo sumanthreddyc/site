@@ -5,8 +5,15 @@
 		<div style="text-align: right;">
 				<a href="/logout">Logout</a>
 				<a href="/people">People</a>
-				<a href="/people">followers</a>
-				<a href="/people">following</a>
+				<a href="/followers">followers</a>
+				<a href="/following">following</a>
+				<a href="/post">post</a>
+		</div>
+		<div>
+			{% for post in posts %}
+        		{{ post.user_id }}<br>
+        		{{ post.post}}<br><br>
+			{% endfor %}
 		</div>
 		</div>
 	{% else %}
